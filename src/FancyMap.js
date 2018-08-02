@@ -1,33 +1,42 @@
-import React, { PureComponent } from 'react';
-import MapComponent from './MapComponent';
+import React, { PureComponent } from "react";
+import MapComponent from "./MapComponent";
 
 class FancyMap extends PureComponent {
-    state = {
-      isMarkerShown: false,
+  state = {
+    isMarkerShown: true,
+    latitude: undefined,
+    longitude: undefined,
+    loading: false
+  };
+
+  componentDidMount() {
+    
+    const success = (pos) => {
+      let coords = pos.coords;
+      console.log(pos);
+      this.setState({
+        latitude: coords.latitude,
+        longitude: coords.longitude
+      })
+      console.log('from state:', this.state)
     }
-  
-    componentDidMount() {
-      this.delayedShowMarker()
+    
+    const error = (err) => {
+      console.warn(`ERROR(${err.code}): ${err.message}`);
     }
-  
-    delayedShowMarker = () => {
-      setTimeout(() => {
-        this.setState({ isMarkerShown: true })
-      }, 3000)
-    }
-  
-    handleMarkerClick = () => {
-      this.setState({ isMarkerShown: false })
-      this.delayedShowMarker()
-    }
-  
-    render() {
-      return (
+
+    navigator.geolocation.getCurrentPosition(success, error);
+  }
+
+  render() {
+    return (
+      <div>
         <MapComponent
           isMarkerShown={this.state.isMarkerShown}
           onMarkerClick={this.handleMarkerClick}
         />
-      )
-    }
+      </div>
+    );
   }
-  export default FancyMap;
+}
+export default FancyMap;
