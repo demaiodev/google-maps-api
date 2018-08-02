@@ -1,40 +1,51 @@
 import React, { PureComponent } from "react";
 import MapComponent from "./MapComponent";
+import Loading from './Loading';
 
 class FancyMap extends PureComponent {
   state = {
     isMarkerShown: true,
-    latitude: undefined,
-    longitude: undefined,
-    loading: false
+    latitude: 1,
+    longitude: 2,
+    loading: true
   };
 
   componentDidMount() {
-    
-    const success = (pos) => {
+    this.getCoords();
+  }
+
+  getCoords = () => {
+    const success = pos => {
       let coords = pos.coords;
       console.log(pos);
       this.setState({
         latitude: coords.latitude,
-        longitude: coords.longitude
-      })
-      console.log('from state:', this.state)
-    }
-    
-    const error = (err) => {
+        longitude: coords.longitude,
+        loading: false,
+        isMarkerShown: true
+      });
+    };
+
+    const error = err => {
       console.warn(`ERROR(${err.code}): ${err.message}`);
-    }
+    };
 
     navigator.geolocation.getCurrentPosition(success, error);
-  }
+  };
 
   render() {
     return (
       <div>
-        <MapComponent
-          isMarkerShown={this.state.isMarkerShown}
-          onMarkerClick={this.handleMarkerClick}
-        />
+        {this.state.loading === true ? (
+          <Loading />
+        ) : (
+          <MapComponent
+            isMarkerShown={this.state.isMarkerShown}
+            latitude={this.state.latitude}
+            longitude={this.state.longitude}
+            loading={this.state.loading}
+          />
+        )}
       </div>
     );
   }
